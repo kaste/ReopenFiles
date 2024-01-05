@@ -38,6 +38,9 @@ class ReopenFilesListener(sublime_plugin.EventListener):
     # no need to persist it here too.
     @ensure_window
     def on_pre_close(self, view: sublime.View, window: sublime.Window) -> None:
+        if view.is_scratch():
+            return
+
         file_name = view.file_name()
         if not file_name:
             return
@@ -55,6 +58,9 @@ class ReopenFilesListener(sublime_plugin.EventListener):
     # has been moved already to not override a possible
     # `window.open_file()` with a `row:col` pair.
     def on_load_async(self, view: sublime.View, window: sublime.Window) -> None:
+        if view.is_scratch():
+            return
+
         if (
             view.viewport_position() != (0, 0)
             or freeze_sel(view) != [(0, 0)]
