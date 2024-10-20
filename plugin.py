@@ -53,11 +53,14 @@ class ReopenFilesListener(sublime_plugin.EventListener):
         store[file_name] = state
         window.settings().set("rf_store", store)
 
-    @ensure_window
-    # Use `on_load_async` here and check if the viewport or cursor
+    # Defer to next tick and check if the viewport or cursor
     # has been moved already to not override a possible
     # `window.open_file()` with a `row:col` pair.
-    def on_load_async(self, view: sublime.View, window: sublime.Window) -> None:
+    def on_load(self, view: sublime.View) -> None:
+        sublime.set_timeout(lambda: self.on_load_(view))
+
+    @ensure_window
+    def on_load_(self, view: sublime.View, window: sublime.Window) -> None:
         if view.is_scratch():
             return
 
